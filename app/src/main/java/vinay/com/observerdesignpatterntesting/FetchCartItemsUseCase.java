@@ -1,5 +1,6 @@
 package vinay.com.observerdesignpatterntesting;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import vinay.com.observerdesignpatterntesting.cart.CartItem;
@@ -8,6 +9,7 @@ import vinay.com.observerdesignpatterntesting.networking.GetCartItemsHttpEndpoin
 
 public class FetchCartItemsUseCase {
 
+    private List<Listener> listeners = new ArrayList<>();
     private final GetCartItemsHttpEndpoint getCartItemsHttpEndpoint;
 
     public FetchCartItemsUseCase(GetCartItemsHttpEndpoint getCartItemsHttpEndpoint) {
@@ -19,7 +21,9 @@ public class FetchCartItemsUseCase {
         getCartItemsHttpEndpoint.getCartItems(limit, new GetCartItemsHttpEndpoint.Callback() {
             @Override
             public void onGetCartItemsSucceeded(List<CartItemSchema> cartItems) {
-
+                for (Listener listener : listeners) {
+                    listener.onCartItemsFetched(cartItemFromSchemas(cartItems));
+                }
             }
 
             @Override
@@ -29,9 +33,18 @@ public class FetchCartItemsUseCase {
         });
     }
 
+    private List<CartItem> cartItemFromSchemas(List<CartItemSchema> cartItems) {
+        List<CartItem> cartItemList = new ArrayList<>();
+        for (CartItemSchema cartItemSchema : cartItems) {
+            cartItemList.add(new CartItem(cartItemSchema.getId(), cartItemSchema.getTitle(), cartItemSchema.getDescription(), cartItemSchema.getPrice()));
 
-    public void registerListener(Listener mListenerMock1) {
+        }
+        return cartItemList;
+    }
 
+
+    public void registerListener(Listener mListener) {
+        listeners.add(mListener);
     }
 
     public interface Listener {
