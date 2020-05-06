@@ -28,6 +28,11 @@ public class FetchCartItemsUseCase {
 
             @Override
             public void onGetCartItemsFailed(GetCartItemsHttpEndpoint.FailReason failReason) {
+                if(failReason == GetCartItemsHttpEndpoint.FailReason.GENERAL_ERROR){
+                    for (Listener listener : listeners) {
+                        listener.onFetchCartItemsFailed();
+                    }
+                }
 
             }
         });
@@ -54,5 +59,7 @@ public class FetchCartItemsUseCase {
 
     public interface Listener {
         void onCartItemsFetched(List<CartItem> capture);
+
+        void onFetchCartItemsFailed();
     }
 }

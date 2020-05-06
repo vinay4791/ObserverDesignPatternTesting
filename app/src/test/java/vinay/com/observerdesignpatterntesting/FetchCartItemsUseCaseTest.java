@@ -112,6 +112,32 @@ public class FetchCartItemsUseCaseTest {
 
     //general error - observers notified of failure
 
+    @Test
+    public void fetchCartItems_generalError_observersNotifiedwithFailure() {
+        //Arrange
+        generalError();
+        //Act
+        mFetchCartItemsUseCase.registerListener(mListenerMock1);
+        mFetchCartItemsUseCase.registerListener(mListenerMock2);
+        mFetchCartItemsUseCase.fetchCartItemsAndNotify(LIMIT);
+
+        //Assert
+        verify(mListenerMock1).onFetchCartItemsFailed();
+        verify(mListenerMock2).onFetchCartItemsFailed();
+    }
+
+    private void generalError() {
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                GetCartItemsHttpEndpoint.Callback callback = (GetCartItemsHttpEndpoint.Callback) args[1];
+                callback.onGetCartItemsFailed(GetCartItemsHttpEndpoint.FailReason.GENERAL_ERROR);
+                return null;
+            }
+        }).when(getCartItemsHttpEndpointMock).getCartItems(anyInt(), any(GetCartItemsHttpEndpoint.Callback.class));
+    }
+
     //network error - observers notified of failure
 
 
