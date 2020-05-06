@@ -47,6 +47,11 @@ public class FetchCartItemsUseCase {
         listeners.add(mListener);
     }
 
+    public void unregisterListener(Listener mListener) {
+        listeners.remove(mListener);
+    }
+
+
     public interface Listener {
         void onCartItemsFetched(List<CartItem> capture);
     }

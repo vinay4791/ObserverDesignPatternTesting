@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -87,13 +88,27 @@ public class FetchCartItemsUseCaseTest {
 
     }
 
-    private List<CartItem> getCartItems() {
-        List<CartItem> cartItems = new ArrayList<>();
-        cartItems.add(new CartItem(ID, TITLE, DESCRIPTION, PRICE));
-        return cartItems;
-    }
+
 
     //success - unsubscribe observers not notified
+    @Test
+    public void fetchCartItems_success_unsubscribedObserversnotNotified() throws Exception{
+        //Arrange
+        //Act
+
+        mFetchCartItemsUseCase.registerListener(mListenerMock1);
+        mFetchCartItemsUseCase.registerListener(mListenerMock2);
+        mFetchCartItemsUseCase.unregisterListener(mListenerMock2);
+
+        mFetchCartItemsUseCase.fetchCartItemsAndNotify(LIMIT);
+
+        //Assert
+
+        verify(mListenerMock1).onCartItemsFetched(any(List.class));
+        verifyNoMoreInteractions(mListenerMock2);
+    }
+
+
 
     //general error - observers notified of failure
 
@@ -117,4 +132,11 @@ public class FetchCartItemsUseCaseTest {
         schemas.add(new CartItemSchema(ID, TITLE, DESCRIPTION, PRICE));
         return schemas;
     }
+
+    private List<CartItem> getCartItems() {
+        List<CartItem> cartItems = new ArrayList<>();
+        cartItems.add(new CartItem(ID, TITLE, DESCRIPTION, PRICE));
+        return cartItems;
+    }
+
 }
