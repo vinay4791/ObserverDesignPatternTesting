@@ -126,17 +126,7 @@ public class FetchCartItemsUseCaseTest {
         verify(mListenerMock2).onFetchCartItemsFailed();
     }
 
-    private void generalError() {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                GetCartItemsHttpEndpoint.Callback callback = (GetCartItemsHttpEndpoint.Callback) args[1];
-                callback.onGetCartItemsFailed(GetCartItemsHttpEndpoint.FailReason.GENERAL_ERROR);
-                return null;
-            }
-        }).when(getCartItemsHttpEndpointMock).getCartItems(anyInt(), any(GetCartItemsHttpEndpoint.Callback.class));
-    }
+
 
     //network error - observers notified of failure
 
@@ -148,6 +138,18 @@ public class FetchCartItemsUseCaseTest {
                 Object[] args = invocation.getArguments();
                 GetCartItemsHttpEndpoint.Callback callback = (GetCartItemsHttpEndpoint.Callback) args[1];
                 callback.onGetCartItemsSucceeded(getCartItemSchemes());
+                return null;
+            }
+        }).when(getCartItemsHttpEndpointMock).getCartItems(anyInt(), any(GetCartItemsHttpEndpoint.Callback.class));
+    }
+
+    private void generalError() {
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                GetCartItemsHttpEndpoint.Callback callback = (GetCartItemsHttpEndpoint.Callback) args[1];
+                callback.onGetCartItemsFailed(GetCartItemsHttpEndpoint.FailReason.GENERAL_ERROR);
                 return null;
             }
         }).when(getCartItemsHttpEndpointMock).getCartItems(anyInt(), any(GetCartItemsHttpEndpoint.Callback.class));
